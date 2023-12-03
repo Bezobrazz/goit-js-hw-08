@@ -16,5 +16,4 @@ const updatePlaybackTime = throttle(currentTime => {
 player.on('timeupdate', data => {
   const currentTime = data.seconds;
   updatePlaybackTime(currentTime);
-  console.log('Time updated:', currentTime);
 });
