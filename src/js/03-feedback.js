@@ -6,19 +6,23 @@ let inputMessage = form.elements.message;
 
 inputEmail.addEventListener('input', onInputHandler);
 inputMessage.addEventListener('input', onInputHandler);
+const localStorageKey = 'feedback-form-state';
 
 function onInputHandler(e) {
-  const inputName = e.target.name;
-  const inputValue = e.target.value;
-  const localStorageKey = `feedback-form-state-${inputName}`;
+  const { name, value } = e.target;
+
+  const storedData = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+
+  storedData[name] = value;
 
   const updateInputTime = throttle(() => {
-    localStorage.setItem(localStorageKey, inputValue);
+    localStorage.setItem(localStorageKey, JSON.stringify(storedData));
   }, 500);
   updateInputTime();
 }
 
 form.addEventListener('submit', onFormSubmit);
+
 function onFormSubmit(e) {
   e.preventDefault();
 
@@ -30,23 +34,18 @@ function onFormSubmit(e) {
   inputEmail.value = '';
   inputMessage.value = '';
 
-  localStorage.clear();
+  localStorage.removeItem(localStorageKey);
 
   console.log(inputsValuesObj);
 }
 
 function fillFormFields() {
-  const emailLocalStorageKey = 'feedback-form-state-email';
-  const messageLocalStorageKey = 'feedback-form-state-message';
+  const savedData = JSON.parse(localStorage.getItem(localStorageKey));
 
-  const savedEmail = localStorage.getItem(emailLocalStorageKey);
-  const savedMessage = localStorage.getItem(messageLocalStorageKey);
-
-  if (savedEmail !== null) {
-    inputEmail.value = savedEmail;
-  }
-  if (savedMessage !== null) {
-    inputMessage.value = savedMessage;
+  if (savedData) {
+    inputEmail.value = savedData.email || '';
+    inputMessage.value = savedData.message || '';
   }
 }
+
 document.addEventListener('DOMContentLoaded', fillFormFields);
